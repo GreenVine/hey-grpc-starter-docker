@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=heygrpc-base
+ARG BASE_IMAGE=hey-grpc-base-builder
 ARG BASE_IMAGE_TAG=latest
 ARG NODE_VERSION=14
 
