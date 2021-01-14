@@ -37,17 +37,6 @@ jobs:
     runs-on: ubuntu-20.04
     needs:
       - lint_dockerfile
-    strategy:
-      fail-fast: true
-      matrix:
-        dockerfile:
-          - docker/base.Dockerfile
-          - docker/node-builder.Dockerfile
-        include:
-          - dockerfile: docker/base.Dockerfile
-            base_image: hey-grpc-base-builder
-          - dockerfile: docker/node-builder.Dockerfile
-            base_image: hey-grpc-nodejs-builder
     steps:
       - id: checkout_repo
         name: Checkout repository
@@ -61,20 +50,43 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_PASS }}
 
-      - id: gen_meta_for_docker_hub
-        name: Generate meta for Docker Hub
+      - id: gen_base_meta_for_docker_hub
+        name: Generate base image meta for Docker Hub
         uses: crazy-max/ghaction-docker-meta@v1
         with:
-          images: ${{ env.DOCKER_HUB_IMAGE_PREFIX }}/${{ matrix.base_image }}
+          images: ${{ env.DOCKER_HUB_IMAGE_PREFIX }}/hey-grpc-base-builder
+          tag-custom: hey-grpc-base-builder:ci-build
           tag-sha: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - id: build_push_to_docker_hub
-        name: Build & push to Docker Hub
+      - id: gen_nodejs_meta_for_docker_hub
+        name: Generate Node.js image meta for Docker Hub
+        uses: crazy-max/ghaction-docker-meta@v1
+        with:
+          images: ${{ env.DOCKER_HUB_IMAGE_PREFIX }}/hey-grpc-nodejs-builder
+          tag-custom: hey-grpc-nodejs-builder:ci-build
+          tag-sha: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: build_push_base_to_docker_hub
+        name: Build/Push base image to Docker Hub
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ${{ matrix.dockerfile }}
+          file: docker/base.Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.gen_meta_for_docker_hub.outputs.tags }}
-          labels: ${{ steps.gen_meta_for_docker_hub.outputs.labels }}
+          tags: ${{ steps.gen_base_meta_for_docker_hub.outputs.tags }}
+          labels: ${{ steps.gen_base_meta_for_docker_hub.outputs.labels }}
+
+      - id: build_push_nodejs_to_docker_hub
+        name: Build/Push Node.js image to Docker Hub
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: docker/node-builder.Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          build-args: |
+            BASE_IMAGE=hey-grpc-base-builder
+            BASE_IMAGE_TAG=ci-build
+          tags: ${{ steps.gen_nodejs_meta_for_docker_hub.outputs.tags }}
+          labels: ${{ steps.gen_nodejs_meta_for_docker_hub.outputs.labels }}
