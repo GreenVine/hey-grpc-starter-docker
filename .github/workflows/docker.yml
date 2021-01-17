@@ -19,7 +19,7 @@ jobs:
       fail-fast: true
       matrix:
         dockerfile:
-          - docker/base.Dockerfile
+          - docker/base-builder.Dockerfile
           - docker/node-builder.Dockerfile
     steps:
       - id: checkout_repo
@@ -85,7 +85,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: docker/base.Dockerfile
+          file: docker/base-builder.Dockerfile
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.gen_base_meta_for_docker_hub.outputs.tags }}
