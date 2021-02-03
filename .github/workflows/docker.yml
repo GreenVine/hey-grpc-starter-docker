@@ -33,7 +33,7 @@ jobs:
           dockerfile: ${{ matrix.dockerfile }}
 
   build_docker:
-    name: Build and push images
+    name: Build & Push Images
     runs-on: ubuntu-20.04
     needs:
       - lint_dockerfile
