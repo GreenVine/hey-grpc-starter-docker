@@ -1,9 +1,12 @@
 ARG GO_VERSION=1.15
+ARG ENABLE_UPX=0
 
 FROM golang:${GO_VERSION}-alpine AS bootstrapper
 LABEL maintainer="Robin Liu <opensource@greenvine.dev>"
+ARG ENABLE_UPX
 
-RUN apk add --update --no-cache build-base ca-certificates curl git upx \
+RUN if [ "${ENABLE_UPX}" = '1' ] || [ "${ENABLE_UPX}" = 'true' ]; then apk --no-cache add upx; fi
+RUN apk add --update --no-cache build-base ca-certificates curl git \
     && rm -rf /var/cache/apk/*
 
 ENV GOLANG_PROTOBUF_VERSION=1.4.3 \
@@ -65,7 +68,7 @@ RUN mkdir -p /tmp/mockery \
     && mv /tmp/mockery/mockery /usr/local/bin/mockery \
     && chmod +x /usr/local/bin/mockery
 
-RUN upx --lzma -q /usr/local/bin/*
+RUN if [ "${ENABLE_UPX}" = '1' ] || [ "${ENABLE_UPX}" = 'true' ]; then upx --lzma -q /usr/local/bin/*; fi
 
 
 FROM alpine:3.13 AS base
