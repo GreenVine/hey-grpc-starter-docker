@@ -86,8 +86,9 @@ jobs:
         with:
           context: .
           file: docker/base-builder.Dockerfile
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
+          build-args: ENABLE_UPX=false
           tags: ${{ steps.gen_base_meta_for_docker_hub.outputs.tags }}
           labels: ${{ steps.gen_base_meta_for_docker_hub.outputs.labels }}
 
@@ -97,10 +98,11 @@ jobs:
         with:
           context: .
           file: docker/node-builder.Dockerfile
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           build-args: |
             BASE_IMAGE=${{ env.DOCKER_HUB_IMAGE_PREFIX }}/hey-grpc-base-builder
             BASE_IMAGE_TAG=commit-${{ steps.get_commit_short_sha.outputs.sha_short }}
+            ENABLE_UPX=false
           tags: ${{ steps.gen_nodejs_meta_for_docker_hub.outputs.tags }}
           labels: ${{ steps.gen_nodejs_meta_for_docker_hub.outputs.labels }}
