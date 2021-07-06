@@ -64,7 +64,7 @@ jobs:
 
       - id: gen_base_meta_for_docker_hub
         name: Generate base image meta for Docker Hub
-        uses: crazy-max/ghaction-docker-meta@v1
+        uses: crazy-max/ghaction-docker-meta@v3.4.0
         with:
           images: ${{ env.DOCKER_HUB_IMAGE_PREFIX }}/hey-grpc-base-builder
           tag-custom: commit-${{ steps.get_commit_short_sha.outputs.sha_short }}
@@ -73,7 +73,7 @@ jobs:
 
       - id: gen_nodejs_meta_for_docker_hub
         name: Generate Node.js image meta for Docker Hub
-        uses: crazy-max/ghaction-docker-meta@v1
+        uses: crazy-max/ghaction-docker-meta@v3.4.0
         with:
           images: ${{ env.DOCKER_HUB_IMAGE_PREFIX }}/hey-grpc-nodejs-builder
           tag-custom: commit-${{ steps.get_commit_short_sha.outputs.sha_short }}
