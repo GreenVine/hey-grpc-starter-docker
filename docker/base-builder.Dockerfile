@@ -71,7 +71,7 @@ RUN mkdir -p /tmp/mockery \
 RUN if [ "${ENABLE_UPX}" = '1' ] || [ "${ENABLE_UPX}" = 'true' ]; then upx --lzma -q /usr/local/bin/*; fi
 
 
-FROM alpine:3.13 AS base
+FROM alpine:3.15.4 AS base
 
 WORKDIR /workspace
 
